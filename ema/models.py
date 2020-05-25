@@ -11,3 +11,17 @@ class Event(models.Model):
 
     def __str__(self):
         return '{} - {}'.format(self.id, self.name)
+
+
+class SignUp(models.Model):
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    email = models.CharField(max_length=128)
+    signup_date = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['event', 'email'], name='signup')
+        ]
+
+    def __str__(self):
+        return '{}-{}-{}'.format(self.id, self.event.id, self.email)
