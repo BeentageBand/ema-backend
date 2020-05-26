@@ -6,6 +6,33 @@ from ema.models import Event, SignUp
 from ema.serializers import *
 
 
+# Helpers
+
+class Helper(object):
+    def get_event(self, event_id):
+        try:
+            model = Event.objects.get(pk=event_id)
+            return None, model
+        except Event.DoesNotExist:
+            response = Response('Event with id {} is not found'.format(event_id), status=status.HTTP_404_NOT_FOUND)
+            return response, None
+
+    def get_signup(self, event_id, signup_id):
+        not_found_response, event = self.get_event(event_id)
+        if None is event:
+            return not_found_response
+
+        try:
+            signup = event.signups.get(pk=signup_id)
+            return None, signup
+        except SignUp.DoesNotExit:
+            response = Response('Email id {} is not signed up to Event {}'.format(signup_id, event),
+                                status=status.HTTP_404_NOT_FOUND)
+            return response, None
+
+
+# APIs
+
 class EventList(APIView):
     def get(self, request):
         model = Event.objects.all()
@@ -23,16 +50,8 @@ class EventList(APIView):
 
 
 class EventDetails(APIView):
-    def get_event(self, event_id):
-        try:
-            model = Event.objects.get(pk=event_id)
-            return None, model
-        except Event.DoesNotExist:
-            response = Response('Event with id {} is not found'.format(event_id), status=status.HTTP_404_NOT_FOUND)
-            return response, None
-
     def get(self, request, event_id):
-        not_found_response, model = self.get_event(event_id)
+        not_found_response, model = Helper().get_event(event_id)
         if None is model:
             return not_found_response
         serializer = EventSerializer(model)
@@ -40,16 +59,8 @@ class EventDetails(APIView):
 
 
 class EventSignup(APIView):
-    def get_event(self, event_id):
-        try:
-            model = Event.objects.get(pk=event_id)
-            return None, model
-        except Event.DoesNotExist:
-            response = Response('Event with id {} is not found'.format(event_id), status=status.HTTP_404_NOT_FOUND)
-            return response, None
-
     def get(self, request, event_id):
-        not_found_response, event = self.get_event(event_id)
+        not_found_response, event = Helper().get_event(event_id)
         if None is event:
             return not_found_response
         serializer = SignUpSerializer(event.signups.all(), many=True)
@@ -77,3 +88,21 @@ class EventSignup(APIView):
                 'Email {} is already signed up to Event with id {}',
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+
+class SignUpDetails(APIView):
+    def get(self, request, event_id, signup_id):
+        not_found_response, signup = Helper().get_signup(event_id, signup_id)
+        if None is signup:
+            return not_found_response
+        serializer = SignUpSerializer(signup)
+        return Response(serializer.data)
+
+    def delete(self, request, event_id, signup_id):
+        not_found_response, signup = Helper().get_signup(event_id, signup_id)
+        if None is signup:
+            return not_found_response
+
+        signup.delete()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)

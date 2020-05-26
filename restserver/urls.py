@@ -16,11 +16,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.conf.urls import url
-from ema.api import EventList, EventDetails, EventSignup
+from ema.api import EventList, EventDetails, EventSignup, SignUpDetails
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     url(r'^api/events/$', EventList.as_view(), name='events'),
     url(r'^api/events/(?P<event_id>\d+)/$', EventDetails.as_view(), name='events'),
-    url(r'^api/events/(?P<event_id>\d+)/signups/$$', EventSignup.as_view(), name='signups'),
+    url(r'^api/events/(?P<event_id>\d+)/signups/$', EventSignup.as_view(), name='signups'),
+    url(r'^api/events/(?P<event_id>\d+)/signups/(?P<signup_id>\d+)/$', SignUpDetails.as_view(), name='signups'),
 ]
