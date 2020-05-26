@@ -3,6 +3,13 @@ from django.db import models
 
 # Create your models here.
 
+# Regular model
+
+class User(object):
+    def __init__(self, email):
+        self.email = email
+
+# DataBase Model
 class Event(models.Model):
     name = models.CharField(max_length=100)
     begin_date = models.DateTimeField()
