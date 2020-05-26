@@ -21,7 +21,7 @@ class Event(models.Model):
 
 
 class SignUp(models.Model):
-    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    event = models.ForeignKey(Event, related_name='signups', on_delete=models.CASCADE)
     email = models.EmailField(max_length=128)
     signup_date = models.DateTimeField(auto_now=True)
 

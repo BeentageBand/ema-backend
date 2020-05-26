@@ -18,13 +18,15 @@ class UserSerializer(serializers.Serializer):
 # Model Serializers
 
 class EventSerializer(serializers.ModelSerializer):
+    signups = serializers.SlugRelatedField(many=True, read_only=True, slug_field='email')
+
     class Meta:
         model = Event
         fields = '__all__'
 
 
 class SignUpSerializer(serializers.ModelSerializer):
-    event = EventSerializer()
+    event = serializers.StringRelatedField()
 
     class Meta:
         model = SignUp

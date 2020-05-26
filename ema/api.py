@@ -49,16 +49,15 @@ class EventSignup(APIView):
             return response, None
 
     def get(self, request, event_id):
-        not_found_response, event_model = self.get_event(event_id)
-        if None is event_model:
+        not_found_response, event = self.get_event(event_id)
+        if None is event:
             return not_found_response
-        model = event_model.signup_set.all()
-        serializer = SignUpSerializer(model, many=True)
+        serializer = SignUpSerializer(event.signups.all(), many=True)
         return Response(serializer.data)
 
     def post(self, request, event_id):
         not_found_response, event = self.get_event(event_id)
-        if None is event :
+        if None is event:
             return not_found_response
 
         serializer = UserSerializer(data=request.data)
@@ -78,4 +77,3 @@ class EventSignup(APIView):
                 'Email {} is already signed up to Event with id {}',
                 status=status.HTTP_400_BAD_REQUEST
             )
-
