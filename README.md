@@ -20,6 +20,17 @@ Python 3.7.3
 
 ## Download Repo
 
+Cloning repo using **ssh** (this options needs public key):
+
+```shell
+git clone git@github.com:BeentageBand/ema.git ema-demo
+```
+
+Cloning repo using **https** (These option needs login):
+
+```shell
+git clone https://github.com/BeentageBand/ema.git ema-demo
+```
 
 ## Initial Setup (Development
 
