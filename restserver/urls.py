@@ -14,14 +14,10 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
-from django.conf.urls import url
-from ema.api import EventList, EventDetails, EventSignup, SignUpDetails
+from django.urls import path, include
 
 urlpatterns = [
+    path('api-auth', include('rest_framework.urls')),
     path('admin/', admin.site.urls),
-    url(r'^api/events/$', EventList.as_view(), name='events'),
-    url(r'^api/events/(?P<event_id>\d+)/$', EventDetails.as_view(), name='events'),
-    url(r'^api/events/(?P<event_id>\d+)/signups/$', EventSignup.as_view(), name='signups'),
-    url(r'^api/events/(?P<event_id>\d+)/signups/(?P<signup_id>\d+)/$', SignUpDetails.as_view(), name='signups'),
+    path('api/', include('ema.api.urls'))
 ]

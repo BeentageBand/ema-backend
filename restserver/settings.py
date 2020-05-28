@@ -117,4 +117,6 @@ STATIC_URL = '/static/'
 
 # FRAMEWORK Configuration
 
-REST_FRAMEWORK = {}
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': []
+}

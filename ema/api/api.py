@@ -2,8 +2,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.db.utils import IntegrityError
+from ema.api.serializers import *
 from ema.models import Event, SignUp
-from ema.serializers import *
 
 
 # Helpers
