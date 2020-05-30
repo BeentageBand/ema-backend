@@ -120,3 +120,14 @@ STATIC_URL = '/static/'
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': []
 }
+
+# Email/SMTP Configuration
+
+SMTP_CONFIG = {
+    'host': 'localhost',
+    'port': 1025,
+    'ssl': False,
+    'username': '',
+    'password': '',
+    'email address': 'example@example.com'
+}
