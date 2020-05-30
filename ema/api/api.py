@@ -8,9 +8,17 @@ from rest_framework import status
 
 from ema.email.emailhandler import EmailHandler
 
+
 # APIs
 
 class EventList(APIView):
+    """
+    get:
+    Get all the events of all existing users
+    post:
+    Create a new event
+    """
+
     def get(self, request):
         model = Event.objects.all()
         serializer = EventSerializer(model, many=True)
@@ -24,6 +32,10 @@ class EventList(APIView):
 
 
 class EventDetails(APIView):
+    """
+    get:
+    Get Event Details from given Event Id
+    """
     dal = DAL()
 
     def get(self, request, event_id):
@@ -33,7 +45,14 @@ class EventDetails(APIView):
 
 
 class EventSignup(APIView):
+    """
+    get:
+    List all SignUps for a given Event Id
+    post:
+    Create a new SignUp for a given Event Id
+    """
     dal = DAL()
+    email_handler = EmailHandler()
 
     def get(self, request, event_id):
         event = self.dal.get_event(event_id)
@@ -50,13 +69,18 @@ class EventSignup(APIView):
         signup_serializer = SignUpSerializer(signup)
 
         event_confirmation = EventConfirmationEmail(from_email=user.email, to_email=user.email, event=event)
-        email_handler = EmailHandler()
-        email_handler.send_email(event_confirmation.get_message())
+        self.email_handler.send_email(event_confirmation.get_message())
 
         return Response(signup_serializer.data, status=status.HTTP_201_CREATED)
 
 
 class SignUpDetails(APIView):
+    """
+    get:
+    Get Signup Details for given Event Id and SignUp Id
+    delete:
+    Destroy Signup Details for given Event Id and SignUp Id
+    """
     dal = DAL()
 
     def get(self, request, event_id, signup_id):

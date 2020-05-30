@@ -20,6 +20,14 @@ class UserSerializer(serializers.Serializer):
 class EventSerializer(serializers.ModelSerializer):
     signups = serializers.SlugRelatedField(many=True, read_only=True, slug_field='email')
 
+    def validate(self, attrs):
+        """
+              Check that start is before finish.
+        """
+        if attrs['begin_date'] > attrs['end_date']:
+            raise serializers.ValidationError("end_date must occur after begin_date")
+        return attrs
+
     class Meta:
         model = Event
         fields = '__all__'

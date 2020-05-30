@@ -71,6 +71,13 @@ Starting development server at http://127.0.0.1:8000/
 Quit the server with CONTROL-C.
 
 ```
+
+## API Documentation
+
+It is possible to access API documentation while the server is running.  
+**Swagger UI**: http://127.0.0.1:8000/doc/
+
+
 ---
 
 # Use Case
