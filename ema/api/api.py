@@ -19,9 +19,12 @@ class EventList(ListCreateAPIView):
     post:
     Create a new event
     """
+    dal = DAL()
     permission_classes = [IsAdminOrReadOnly]
-    queryset = DAL().list_events()
     serializer_class = EventSerializer
+
+    def get_queryset(self):
+        return self.dal.list_events()
 
 
 class EventDetails(RetrieveUpdateDestroyAPIView):
@@ -78,6 +81,7 @@ class SignUpDetails(RetrieveUpdateDestroyAPIView):
     dal = DAL()
     permission_classes = [IsAdminUser]
     serializer_class = SignUpSerializer
+    lookup_field = 'event_id'
 
     def get_object(self):
         event_id = self.kwargs['event_id']
@@ -101,6 +105,7 @@ class UserDetails(RetrieveAPIView):
     """
     dal = DAL()
     serializer_class = UserRequestSerializer
+    lookup_field = 'event_id'
 
     def get_object(self):
         signups = self.dal.get_signups_by_email(self.request.user.email)
@@ -120,13 +125,14 @@ class UserSignUpDetails(RetrieveUpdateDestroyAPIView):
     email_handler = EmailHandler()
     serializer_class = SignUpSerializer
 
-    def get(self, request, event_id):
-        event = self.dal.get_event(event_id, request.user.email)
+    def get_object(self):
+        event_id = self.kwargs['event_id']
+        event = self.dal.get_event(event_id)
+        signup = self.dal.get_signup_by_email_or_raise(event, self.request.user.email)
+        return signup[0]
 
-        serializer = EventWithoutSignupsSerializer(event)
-        return Response(serializer.data)
-
-    def put(self, request, event_id):
+    def update(self, request, *args, **kwargs):
+        event_id = kwargs['event_id']
         event = self.dal.get_event(event_id)
 
         signup = self.dal.set_signup(event, request.user.email)
@@ -138,6 +144,7 @@ class UserSignUpDetails(RetrieveUpdateDestroyAPIView):
 
         return Response(signup_serializer.data, status=status.HTTP_201_CREATED)
 
-    def delete(self, request, event_id):
+    def destroy(self, request, *args, **kwargs):
+        event_id = kwargs['event_id']
         self.dal.delete_signup_by_email(event_id, request.user.email)
         return Response(status=status.HTTP_204_NO_CONTENT)

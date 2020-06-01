@@ -13,7 +13,8 @@ class EmailHandlerTest(TestCase):
             'port': 1025,
             'ssl': False,
             'username': '',
-            'password': ''
+            'password': '',
+            'emailAddress': 'fwd@example.com'
         }
 
         self.email_handler = EmailHandler(config=self.config)

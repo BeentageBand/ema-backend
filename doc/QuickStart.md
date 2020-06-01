@@ -58,7 +58,6 @@ password= <password> ## Email Server Password authentication
 emailAddress = example@example.com ## Default email to fwd any emails sent from the App
 ```
 
-
 ## Unit Test
 
 The packages leverage on the Django TestCase class to perform unittests. TestCase creates temporal DB files for model testing.

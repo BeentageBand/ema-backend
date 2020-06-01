@@ -11,12 +11,6 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['username', 'email']
 
 
-class EventWithoutSignupsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Event
-        fields = ['id', 'name', 'begin_date', 'end_date', 'location']
-
-
 class EventSerializer(serializers.ModelSerializer):
     signups = serializers.SlugRelatedField(many=True, read_only=True, slug_field='email')
 
@@ -35,6 +29,7 @@ class EventSerializer(serializers.ModelSerializer):
 
 class SignUpSerializer(serializers.ModelSerializer):
     event = serializers.StringRelatedField()
+    email = serializers.EmailField(max_length=128)
 
     class Meta:
         model = SignUp
@@ -45,6 +40,20 @@ class UserCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['username', 'password', 'email']
+        extra_kwargs = {
+            'password': {
+                'write_only': True
+            }
+        }
+
+    def create(self, validated_data):
+        email = validated_data['email']
+        username = validated_data['username']
+        password = validated_data['email']
+        user = User(username=username, email=email)
+        user.set_password(password)
+        user.save()
+        return validated_data
 
 
 # Object Serializers

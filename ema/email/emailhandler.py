@@ -5,11 +5,11 @@ from smtplib import SMTP, SMTP_SSL, SMTPNotSupportedError
 class EmailHandler:
     def __init__(self, config=SMTP_CONFIG):
         self.host = config['host']
-        self.port = config.getint('port')
+        self.port = config['port']
         self.username = config['username']
         self.password = config['password']
         self.fwd_address = config['emailAddress']
-        self.provide_smtp = SMTP_SSL if config.getboolean('ssl') else SMTP
+        self.provide_smtp = SMTP_SSL if config['ssl'] else SMTP
 
     def auth(self, client):
         try:
@@ -20,7 +20,7 @@ class EmailHandler:
 
     def send_email(self, email_message):
         email_message['CC'] = self.fwd_address
-        print (f'Sending email to {self.host}:{self.port}')
+        print(f'Sending email to {self.host}:{self.port}')
         client = self.provide_smtp(self.host, self.port)
         self.auth(client)
         client.send_message(email_message)

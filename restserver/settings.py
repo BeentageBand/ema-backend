@@ -134,4 +134,11 @@ REST_FRAMEWORK = {
 
 # Email/SMTP Configuration
 
-SMTP_CONFIG = SETUP_CFG['EmailSetup']
+SMTP_CONFIG = {
+    'host' : SETUP_CFG['EmailSetup'].get('host'),
+    'port': SETUP_CFG['EmailSetup'].getint('port'),
+    'ssl': SETUP_CFG['EmailSetup'].getboolean('ssl'),
+    'username': SETUP_CFG['EmailSetup'].get('username'),
+    'password': SETUP_CFG['EmailSetup'].get('password'),
+    'emailAddress': SETUP_CFG['EmailSetup'].get('emailAddress')
+}

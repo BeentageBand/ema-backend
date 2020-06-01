@@ -8,7 +8,6 @@ This project is responsible to handle the backed service and data model for even
 
 ## About EMA
 
-1. [EMA Design](doc/Design.md)  
 1. [EMA Use Cases](doc/Design.md)
 
 ## Quick Start

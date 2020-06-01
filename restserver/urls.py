@@ -37,5 +37,5 @@ urlpatterns = [
     path('api-auth', include('rest_framework.urls')),
     path('admin/', admin.site.urls),
     path('api/', include('ema.api.urls')),
-    url(r'^doc/$', schema_view.with_ui('redoc', cache_timeout=0), name='doc')
+    url(r'^doc/$', schema_view.with_ui('redoc', cache_timeout=0), name='doc'),
 ]
