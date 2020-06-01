@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from ema.models import Event, SignUp, UserRequest
-
 from django.contrib.auth.models import User
 
 
@@ -40,6 +39,12 @@ class SignUpSerializer(serializers.ModelSerializer):
     class Meta:
         model = SignUp
         fields = '__all__'
+
+
+class UserCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username', 'password', 'email']
 
 
 # Object Serializers

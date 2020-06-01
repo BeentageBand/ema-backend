@@ -1,59 +1,45 @@
 from ema.api.dal import DAL
 from ema.api.permissions import IsAdminOrReadOnly
-from ema.api.serializers import EventSerializer, SignUpSerializer, EventWithoutSignupsSerializer, UserRequestSerializer
+from ema.api.serializers import *
 from ema.email.confirmationemail import EventConfirmationEmail
 from ema.email.emailhandler import EmailHandler
 from ema.models import UserRequest
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.permissions import IsAdminUser
-from rest_framework.views import APIView
+from rest_framework.permissions import IsAdminUser, AllowAny
+from rest_framework.generics import CreateAPIView, ListCreateAPIView, RetrieveAPIView, RetrieveUpdateDestroyAPIView
 
 
 # APIs
 
-class EventList(APIView):
+class EventList(ListCreateAPIView):
     """
     get:
     Get all the events of all existing users
     post:
     Create a new event
     """
-    dal = DAL()
     permission_classes = [IsAdminOrReadOnly]
-
-    def get(self, request):
-        model = self.dal.list_events()
-        serializer = EventSerializer(model, many=True)
-        return Response(serializer.data)
-
-    def post(self, request):
-        serializer = EventSerializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+    queryset = DAL().list_events()
+    serializer_class = EventSerializer
 
 
-class EventDetails(APIView):
+class EventDetails(RetrieveUpdateDestroyAPIView):
     """
     get:
     Get Event Details from given Event Id
     """
     dal = DAL()
     permission_classes = [IsAdminOrReadOnly]
+    serializer_class = EventSerializer
+    lookup_field = 'event_id'
 
-    def get(self, request, event_id):
-        model = self.dal.get_event(event_id)
-        serializer = EventSerializer(model)
-        return Response(serializer.data)
-
-    def delete(self, request, event_id):
-        event = self.dal.get_event(event_id)
-        event.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    def get_object(self):
+        event_id = self.kwargs['event_id']
+        return self.dal.get_event(event_id)
 
 
-class EventSignUp(APIView):
+class EventSignUp(ListCreateAPIView):
     """
     get:
     List all SignUps for a given Event Id
@@ -61,16 +47,17 @@ class EventSignUp(APIView):
     Create a new SignUp for a given Event Id
     """
     dal = DAL()
+    serializer_class = SignUpSerializer
     permission_classes = [IsAdminUser]
+    lookup_field = 'event_id'
 
-    def get(self, request, event_id):
+    def get_queryset(self):
+        event_id = self.kwargs['event_id']
+        return self.dal.get_event(event_id).signups
+
+    def create(self, request, *args, **kwargs):
+        event_id = self.kwargs['event_id']
         event = self.dal.get_event(event_id)
-        serializer = SignUpSerializer(event.signups.all(), many=True)
-        return Response(serializer.data)
-
-    def post(self, request, event_id):
-        event = self.dal.get_event(event_id)
-
         user_serializer = UserRequestSerializer(data=request.data)
         user_serializer.is_valid(raise_exception=True)
         user_request = user_serializer.save()
@@ -81,7 +68,7 @@ class EventSignUp(APIView):
         return Response(signup_serializer.data, status=status.HTTP_201_CREATED)
 
 
-class SignUpDetails(APIView):
+class SignUpDetails(RetrieveUpdateDestroyAPIView):
     """
     get:
     Get Signup Details for given Event Id and SignUp Id
@@ -90,33 +77,37 @@ class SignUpDetails(APIView):
     """
     dal = DAL()
     permission_classes = [IsAdminUser]
+    serializer_class = SignUpSerializer
 
-    def get(self, request, event_id, signup_id):
-        signup = self.dal.get_signup(event_id, signup_id)
-        serializer = SignUpSerializer(signup)
-        return Response(serializer.data)
-
-    def delete(self, request, event_id, signup_id):
-        signup = self.dal.get_signup(event_id, signup_id)
-        signup.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    def get_object(self):
+        event_id = self.kwargs['event_id']
+        signup_id = self.kwargs['signup_id']
+        return self.dal.get_signup(event_id, signup_id)
 
 
-class UserDetails(APIView):
+class UserCreate(CreateAPIView):
+    """
+    Create a new User
+    """
+    permission_classes = [AllowAny]
+    queryset = User.objects.all()
+    serializer_class = UserCreateSerializer
+
+
+class UserDetails(RetrieveAPIView):
     """
     get:
     Get User Email
     """
     dal = DAL()
+    serializer_class = UserRequestSerializer
 
-    def get(self, request):
-        signups = self.dal.get_signups_by_email(request.user.email)
-        user_request = UserRequest(username=request.user.username, email=request.user.email, signups=signups)
-        serializer = UserRequestSerializer(user_request)
-        return Response(serializer.data)
+    def get_object(self):
+        signups = self.dal.get_signups_by_email(self.request.user.email)
+        return UserRequest(username=self.request.user.username, email=self.request.user.email, signups=signups)
 
 
-class UserSignUpDetails(APIView):
+class UserSignUpDetails(RetrieveUpdateDestroyAPIView):
     """
     get:
     Get User's Event SignUp
@@ -127,6 +118,7 @@ class UserSignUpDetails(APIView):
     """
     dal = DAL()
     email_handler = EmailHandler()
+    serializer_class = SignUpSerializer
 
     def get(self, request, event_id):
         event = self.dal.get_event(event_id, request.user.email)
