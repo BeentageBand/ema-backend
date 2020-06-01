@@ -31,6 +31,10 @@ class EventDetails(RetrieveUpdateDestroyAPIView):
     """
     get:
     Get Event Details from given Event Id
+    put:
+    Update Event Details from given Event Id
+    delete:
+    Delete Event Details from given Event Id. SignUps are removed altogether.
     """
     dal = DAL()
     permission_classes = [IsAdminOrReadOnly]
@@ -75,6 +79,8 @@ class SignUpDetails(RetrieveUpdateDestroyAPIView):
     """
     get:
     Get Signup Details for given Event Id and SignUp Id
+    put:
+    Update Signup Details for given Event Id and SignUp Id
     delete:
     Destroy Signup Details for given Event Id and SignUp Id
     """
