@@ -25,9 +25,9 @@ SETUP_CFG.read_file(open(os.path.join(BASE_DIR, 'setup.cfg')))
 SECRET_KEY = '@4&e(ylt=!_)(%s*5ewjz+apr4_5!yzlsm2cvsi6)3t!-)!qfn'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = SETUP_CFG['Django']['debug']
+DEBUG = SETUP_CFG['Django'].getboolean('debug')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -142,3 +142,4 @@ SMTP_CONFIG = {
     'password': SETUP_CFG['EmailSetup'].get('password'),
     'emailAddress': SETUP_CFG['EmailSetup'].get('emailAddress')
 }
+
