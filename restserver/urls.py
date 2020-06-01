@@ -40,5 +40,5 @@ urlpatterns = [
     path('api/', include('ema.api.urls')),
     url(r'^doc/$', schema_view.with_ui('redoc', cache_timeout=0), name='doc'),
     url(r'^accounts/profile/$', RedirectView.as_view(pattern_name='user'), name='redirect-user'),
-    url(r'^$', RedirectView.as_view(pattern_name='doc'), name='redirect-doc'),
+    url(r'^.*$', RedirectView.as_view(pattern_name='doc'), name='redirect-doc'),
 ]

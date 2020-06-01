@@ -7,6 +7,7 @@ from ema.models import UserRequest
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser, AllowAny
+from rest_framework_api_key.permissions import HasAPIKey
 from rest_framework.generics import CreateAPIView, ListCreateAPIView, RetrieveAPIView, RetrieveUpdateDestroyAPIView
 
 
@@ -20,7 +21,7 @@ class EventList(ListCreateAPIView):
     Create a new event
     """
     dal = DAL()
-    permission_classes = [IsAdminOrReadOnly]
+    permission_classes = [IsAdminOrReadOnly | HasAPIKey]
     serializer_class = EventSerializer
 
     def get_queryset(self):

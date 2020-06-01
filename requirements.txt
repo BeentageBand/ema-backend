@@ -4,7 +4,9 @@ chardet==3.0.4
 coreapi==2.3.3
 coreschema==0.0.4
 Django==3.0.6
+django-cors-headers==3.3.0
 djangorestframework==3.11.0
+djangorestframework-api-key==2.0.0
 drf-yasg==1.17.1
 idna==2.9
 inflection==0.4.0
