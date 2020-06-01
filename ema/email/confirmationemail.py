@@ -7,13 +7,14 @@ class EventConfirmationEmail:
         self.message['Subject'] = f'Confirmation Email for {event.name}'
         self.message['From'] = from_email
         self.message['To'] = to_email
+        self.location = event.location if event.location else 'Unknown'
 
         content = f'''
         Congratulations!
         You have been invited to :
         Event : {event.name}
         Date : {event.begin_date}
-        At : {event.location}
+        At : {self.location}
         This is RVSP.
         '''
         self.message.set_content(content)

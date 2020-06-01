@@ -1,29 +1,43 @@
 from django.db import models
 
-
 # Create your models here.
 
-# Regular model
+class UserRequest(object):
+    """
+    Object use in UserRequestSerializer to handle request.data
+    """
 
-class User(object):
-    def __init__(self, email):
+    def __init__(self, username=None, email=None, signups=[]):
+        self.username = username
         self.email = email
+        self.signups = signups
+
 
 # DataBase Model
 class Event(models.Model):
-    name = models.CharField(max_length=100)
-    begin_date = models.DateTimeField()
-    end_date = models.DateTimeField()
-    location = models.CharField(max_length=255, null=True, blank=True)
+    """
+    Event DB Model
+    """
+    name = models.CharField(max_length=100,
+                            help_text="Event\'s name")
+    begin_date = models.DateTimeField(help_text='Event begin date, it should be before end date')
+    end_date = models.DateTimeField(help_text='Event end date, it should be after begin date')
+    location = models.CharField(max_length=255, null=True, blank=True,
+                                help_text="Event\'s location. It's as description only")
 
     def __str__(self):
         return '{} - {}'.format(self.id, self.name)
 
 
 class SignUp(models.Model):
-    event = models.ForeignKey(Event, related_name='signups', on_delete=models.CASCADE)
-    email = models.EmailField(max_length=128)
-    signup_date = models.DateTimeField(auto_now=True)
+    """
+    SignUp DB Model
+    event and email have to be unique.
+    """
+    event = models.ForeignKey(Event, related_name='signups', on_delete=models.CASCADE,
+                              help_text='Event entry, it should be a unique pair with User')
+    email = models.EmailField(max_length=64, help_text='User entry, it should be a unique pair with Event.')
+    signup_date = models.DateTimeField(auto_now=True, help_text='Date when signup was created')
 
     class Meta:
         constraints = [

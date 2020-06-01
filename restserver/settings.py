@@ -10,10 +10,13 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
+from configparser import ConfigParser
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+SETUP_CFG = ConfigParser()
+SETUP_CFG.read_file(open(os.path.join(BASE_DIR, 'setup.cfg')))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
@@ -22,7 +25,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '@4&e(ylt=!_)(%s*5ewjz+apr4_5!yzlsm2cvsi6)3t!-)!qfn'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = SETUP_CFG['Django']['debug']
 
 ALLOWED_HOSTS = []
 
@@ -119,17 +122,16 @@ STATIC_URL = '/static/'
 # FRAMEWORK Configuration
 
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': [],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated'
+    ],
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.openapi.AutoSchema'
 }
 
 # Email/SMTP Configuration
 
-SMTP_CONFIG = {
-    'host': 'localhost',
-    'port': 1025,
-    'ssl': False,
-    'username': '',
-    'password': '',
-    'email address': 'example@example.com'
-}
+SMTP_CONFIG = SETUP_CFG['EmailSetup']

@@ -1,21 +1,22 @@
 from rest_framework import serializers
-from ema.models import Event, SignUp, User
+from ema.models import Event, SignUp, UserRequest
 
-
-# Object Serializers
-
-class UserSerializer(serializers.Serializer):
-    email = serializers.EmailField(max_length=128)
-
-    def create(self, validated_data):
-        return User(**validated_data)
-
-    def update(self, instance, validated_data):
-        instance.email = validated_data.get('email', instance.email)
-        return instance
+from django.contrib.auth.models import User
 
 
 # Model Serializers
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username', 'email']
+
+
+class EventWithoutSignupsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Event
+        fields = ['id', 'name', 'begin_date', 'end_date', 'location']
+
 
 class EventSerializer(serializers.ModelSerializer):
     signups = serializers.SlugRelatedField(many=True, read_only=True, slug_field='email')
@@ -39,3 +40,18 @@ class SignUpSerializer(serializers.ModelSerializer):
     class Meta:
         model = SignUp
         fields = '__all__'
+
+
+# Object Serializers
+
+class UserRequestSerializer(serializers.Serializer):
+    email = serializers.EmailField(max_length=128)
+    username = serializers.CharField(max_length=100, allow_blank=True, allow_null=True, required=False)
+    signups = SignUpSerializer(many=True, allow_null=True, required=False)
+
+    def create(self, validated_data):
+        return UserRequest(**validated_data)
+
+    def update(self, instance, validated_data):
+        instance.email = validated_data.get('email', instance.email)
+        return instance

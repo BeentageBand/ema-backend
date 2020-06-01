@@ -1,7 +1,8 @@
 from .dal import DAL
+from django.contrib.auth.models import User
 from django.test import TestCase
 from datetime import datetime
-from ema.models import Event, SignUp, User
+from ema.models import Event, SignUp
 from rest_framework.exceptions import NotFound, ParseError
 
 
@@ -13,16 +14,25 @@ class DALTest(TestCase):
     EVENT_NAME = 'EVENT'
     EVENT_BEGIN_DATE = '2020-05-29 06:00+00:00'
     EVENT_END_DATE = '2020-05-29 18:00+00:00'
+
+    USER_NAME_1 = 'username'
+    USER_EMAIL_1 = 'dummy@dummy.com'
+    USER_NAME_2 = '2username'
+    USER_EMAIL_2 = '2dummy@dummy.com'
     SIGNUP_VALID_ID = 1
     SIGNUP_INVALID_ID = 100
-    SIGNUP_EMAIL = 'dummy@dummy.com'
-    SIGNUP_NEW_EMAIL = '2' + SIGNUP_EMAIL
 
     def setUp(self):
         self.dal = DAL()
+        User.objects.create(username=self.USER_NAME_1, email=self.USER_EMAIL_1)
+        User.objects.create(username=self.USER_NAME_2, email=self.USER_EMAIL_2)
         self.event = Event(name=self.EVENT_NAME, begin_date=self.EVENT_BEGIN_DATE, end_date=self.EVENT_END_DATE)
         self.event.save()
-        SignUp.objects.create(event=self.event, email=self.SIGNUP_EMAIL)
+        SignUp.objects.create(event=self.event, email=self.USER_EMAIL_1)
+
+    def text_get_all_events(self):
+        event_list = self.dal.list_events()
+        self.assertEqual(len(event_list), 1, 'List is not 1 item')
 
     def test_when_event_does_not_exist_raise_not_found(self):
         try:
@@ -47,20 +57,18 @@ class DALTest(TestCase):
         self._validate_signup(signup)
 
     def test_when_signup_duplicated_email_raise_parse_error(self):
-        user = User(email=self.SIGNUP_EMAIL)
         try:
-            self.dal.set_signup(self.event, user)
+            self.dal.set_signup(self.event, self.USER_EMAIL_1)
             self.fail('SignUp should not succeed')
         except ParseError:
             pass
 
     def test_when_signup_new_email(self):
-        user = User(email=self.SIGNUP_NEW_EMAIL)
         try:
-            signup = self.dal.set_signup(self.event, user)
+            signup = self.dal.set_signup(self.event, email=self.USER_EMAIL_2)
         except ParseError:
             self.fail('SignUp should succeed')
-        self.assertEqual(signup.email, self.SIGNUP_NEW_EMAIL, 'Emails do not match')
+        self.assertEqual(signup.email, self.USER_EMAIL_2, 'Emails do not match')
         self.assertEqual(self.event, signup.event, 'Events do not match')
 
     def _validate_event(self, event):
@@ -70,4 +78,4 @@ class DALTest(TestCase):
         self.assertEqual(event.end_date, datetime.fromisoformat(self.EVENT_END_DATE), 'Event end dates dont match')
 
     def _validate_signup(self, signup):
-        self.assertEqual(signup.email, self.SIGNUP_EMAIL, 'Signup emails dont match')
+        self.assertEqual(signup.email, self.USER_EMAIL_1, 'Signup emails dont match')
