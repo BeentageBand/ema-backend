@@ -58,6 +58,27 @@ password= <password> ## Email Server Password authentication
 emailAddress = example@example.com ## Default email to fwd any emails sent from the App
 ```
 
+
+## Unit Test
+
+The packages leverage on the Django TestCase class to perform unittests. TestCase creates temporal DB files for model testing.
+Run the following.
+
+For running tests for all package:
+```shell 
+python3 manage.py test ema
+```
+
+For running model tests:
+```shell 
+python3 manage.py test ema.tests
+```
+
+For running api tests (DAL):
+```shell 
+python3 manage.py test ema.api.tests.DALTest
+```
+
 ## Launch REST Server
 
 Server can be launch if setup was done successfully. This server need Django and REST framework to be launched.
