@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'ema',
     'rest_framework',
-    'rest_framework_api_key',
     'drf_yasg',
 ]
 
