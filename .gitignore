@@ -130,3 +130,5 @@ dmypy.json
 
 # Py Charm
 .idea
+# sqlite
+db.sqlite3

@@ -13,7 +13,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.conf.urls import url
+from django.urls import re_path, path
 from django.contrib import admin
 from django.urls import path, include
 from drf_yasg.views import get_schema_view
@@ -38,7 +38,7 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls')),
     path('admin/', admin.site.urls),
     path('api/', include('ema.api.urls')),
-    url(r'^doc/$', schema_view.with_ui('redoc', cache_timeout=0), name='doc'),
-    url(r'^accounts/profile/$', RedirectView.as_view(pattern_name='user'), name='redirect-user'),
-    url(r'^.*$', RedirectView.as_view(pattern_name='doc'), name='redirect-doc'),
+    re_path(r'^doc/$', schema_view.with_ui('redoc', cache_timeout=0), name='doc'),
+    re_path(r'^accounts/profile/$', RedirectView.as_view(pattern_name='user'), name='redirect-user'),
+    re_path(r'^.*$', RedirectView.as_view(pattern_name='doc'), name='redirect-doc'),
 ]
