@@ -1,0 +1,7 @@
+*
+*.p[yc]
+*.cfg
+*.md
+*.txt
+.git
+!requirements.txt
