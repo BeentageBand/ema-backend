@@ -1,0 +1,39 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ema-svc
+spec:
+  selector:
+    app: ema
+  ports:
+  - protocol: TCP
+    port: 8000
+    targetPort: 8000
+  type: NodePort
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ema
+  labels:
+    app: ema
+spec:
+  replicas: 10
+  selector:
+    matchLabels:
+      app: ema
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: ema
+    spec:
+      containers:
+      - image: beentageband/ema:alpine
+        name: ema
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8000
