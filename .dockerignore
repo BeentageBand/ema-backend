@@ -1,7 +1,7 @@
-*
-*.p[yc]
-*.cfg
+*/__pycache__
 *.md
-*.txt
+*.pyc
+*.sqlite3
+doc
+k8s
 .git
-!requirements.txt
