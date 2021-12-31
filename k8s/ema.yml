@@ -1,8 +1,20 @@
 ---
 apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ema-config
+data:
+  DJANGO_ALLOWED_HOSTS: "*"
+  DJANGO_LOGLEVEL: "info"
+  DEBUG: "true"
+  DATABASE_ENGINE: "mysql"
+  DATABASE_HOST: "mysql.default.svc.cluster.local"
+
+---
+apiVersion: v1
 kind: Service
 metadata:
-  name: ema-svc
+  name: ema
 spec:
   selector:
     app: ema
@@ -20,7 +32,7 @@ metadata:
   labels:
     app: ema
 spec:
-  replicas: 10
+  replicas: 2
   selector:
     matchLabels:
       app: ema
@@ -32,8 +44,27 @@ spec:
         app: ema
     spec:
       containers:
-      - image: beentageband/ema:alpine
-        name: ema
+      - envFrom:
+        - secretRef:
+            name: ema-secrets
+        - configMapRef:
+            name: ema-config
+        image: beentageband/ema:alpine
         imagePullPolicy: IfNotPresent
+        name: ema
         ports:
         - containerPort: 8000
+      initContainers:
+      - args: 
+        - "-c"
+        - "python3 manage.py migrate; python3 manage.py createsuperuser"
+        command: ["/bin/sh"]
+        envFrom:
+        - secretRef:
+            name: ema-secrets
+        - configMapRef:
+            name: ema-config
+        image: beentageband/ema:alpine
+        imagePullPolicy: IfNotPresent
+        name: django-migrate
+

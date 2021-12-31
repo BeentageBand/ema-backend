@@ -10,24 +10,21 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
-from configparser import ConfigParser
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SETUP_CFG = ConfigParser()
-SETUP_CFG.read_file(open(os.path.join(BASE_DIR, 'setup.cfg')))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '@4&e(ylt=!_)(%s*5ewjz+apr4_5!yzlsm2cvsi6)3t!-)!qfn'
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = SETUP_CFG['Django'].getboolean('debug')
+DEBUG = os.getenv('DJANGO_DEBUG', False)
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', '127.0.0.1').split(',')
 
 # Application definition
 
@@ -78,8 +75,15 @@ WSGI_APPLICATION = 'restserver.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.%s' % os.getenv('DATABASE_ENGINE','sqlite3'),
+        'NAME': os.getenv('DATABASE_NAME', 'ema.sqlite3'),
+        'USER': os.getenv('DATABASE_USERNAME', 'myprojectuser'),
+        'PASSWORD': os.getenv('DATABASE_PASSWORD', 'password'),
+        'HOST': os.getenv('DATABASE_HOST', '127.0.0.1'),
+        'PORT': os.getenv('DATABASE_PORT', 5432),
+        'OPTIONS': json.loads(
+            os.getenv('DATABASE_OPTIONS', '{}')
+        ),
     }
 }
 
@@ -135,11 +139,11 @@ REST_FRAMEWORK = {
 # Email/SMTP Configuration
 
 SMTP_CONFIG = {
-    'host' : SETUP_CFG['EmailSetup'].get('host'),
-    'port': SETUP_CFG['EmailSetup'].getint('port'),
-    'ssl': SETUP_CFG['EmailSetup'].getboolean('ssl'),
-    'username': SETUP_CFG['EmailSetup'].get('username'),
-    'password': SETUP_CFG['EmailSetup'].get('password'),
-    'emailAddress': SETUP_CFG['EmailSetup'].get('emailAddress')
+    'host' : os.getenv('SMTP_HOST', 'localhost'),
+    'port': os.getenv('STMP_PORT', 1025),
+    'ssl': os.getenv('STMP_SSL', False),
+    'username': os.getenv('STMP_USERNAME', ''),
+    'password': os.getenv('STMP_PASSWORD', ''),
+    'emailAddress': os.getenv('STMP_EMAIL_ADDRESS', 'example@example.com')
 }
 
