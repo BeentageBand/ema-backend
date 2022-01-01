@@ -60,15 +60,15 @@ spec:
       containers:
       - image: library/postgres:alpine
         name: postgres
-        env:
-        - name: MYSQL_ROOT_PASSWORD
-          value: password
+        envFrom:
+        - secretRef:
+            name: ema-secrets
         ports:
-        - containerPort: 3306
+        - containerPort: 5432
           name: postgres
         volumeMounts:
         - name: postgres-vol
-          mountPath: /var/lib/postgres
+          mountPath: /var/lib/postgresql/data
       volumes:
       - name: postgres-vol
         persistentVolumeClaim:
