@@ -75,7 +75,7 @@ WSGI_APPLICATION = 'restserver.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.%s' % os.getenv('DATABASE_ENGINE','sqlite3'),
+        'ENGINE': 'django.db.backends.' + os.getenv('DATABASE_ENGINE','sqlite3'),
         'NAME': os.getenv('DATABASE_NAME', 'ema.sqlite3'),
         'USER': os.getenv('DATABASE_USERNAME', 'myprojectuser'),
         'PASSWORD': os.getenv('DATABASE_PASSWORD', 'password'),

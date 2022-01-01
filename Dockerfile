@@ -5,6 +5,8 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 RUN apk --update --no-cache --virtual .tmp-build-deps add python3-dev \
+      postgresql-dev \
+      build-base\
       gcc \
       libc-dev \
       libffi-dev

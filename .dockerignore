@@ -4,4 +4,5 @@
 *.sqlite3
 doc
 k8s
+venv
 .git

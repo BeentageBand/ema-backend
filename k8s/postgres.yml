@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: mysql-pv
+  name: postgres-pv
 spec:
   capacity:
     storage: 1Gi
@@ -16,7 +16,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: mysql-pvc
+  name: postgres-pvc
 spec:
   storageClassName: manual
   accessModes:
@@ -29,13 +29,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: mysql
+  name: postgres
 spec:
   selector:
-    app: mysql
+    app: postgres
   ports:
   - protocol: TCP
-    port: 3306
+    port: 5432
     targetPort: 32027
   type: NodePort
 
@@ -43,33 +43,33 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mysql
+  name: postgres
   labels:
-    app: mysql
+    app: postgres
 spec:
   selector:
     matchLabels:
-      app: mysql
+      app: postgres
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: mysql
+        app: postgres
     spec:
       containers:
-      - image: mysql:5.6
-        name: mysql
+      - image: library/postgres:alpine
+        name: postgres
         env:
         - name: MYSQL_ROOT_PASSWORD
           value: password
         ports:
         - containerPort: 3306
-          name: mysql
+          name: postgres
         volumeMounts:
-        - name: mysql-vol
-          mountPath: /var/lib/mysql
+        - name: postgres-vol
+          mountPath: /var/lib/postgres
       volumes:
-      - name: mysql-vol
+      - name: postgres-vol
         persistentVolumeClaim:
-          claimName: mysql-pvc
+          claimName: postgres-pvc

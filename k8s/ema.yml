@@ -7,8 +7,8 @@ data:
   DJANGO_ALLOWED_HOSTS: "*"
   DJANGO_LOGLEVEL: "info"
   DEBUG: "true"
-  DATABASE_ENGINE: "mysql"
-  DATABASE_HOST: "mysql.default.svc.cluster.local"
+  DATABASE_ENGINE: "postgres"
+  DATABASE_HOST: "postgres.default.svc.cluster.local"
 
 ---
 apiVersion: v1
