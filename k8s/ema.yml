@@ -26,7 +26,6 @@ spec:
   - protocol: TCP
     port: 8000
     targetPort: 8000
-  type: NodePort
 
 ---
 apiVersion: apps/v1
@@ -54,7 +53,7 @@ spec:
         - configMapRef:
             name: ema-config
         image: beentageband/ema:alpine
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         name: ema
         ports:
         - containerPort: 8000
@@ -69,6 +68,6 @@ spec:
         - configMapRef:
             name: ema-config
         image: beentageband/ema:alpine
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         name: django-migrate
 
