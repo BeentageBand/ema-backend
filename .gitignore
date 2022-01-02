@@ -132,3 +132,8 @@ dmypy.json
 .idea
 # sqlite
 db.sqlite3
+
+# Terraform
+.terraform
+*.lock.hcl
+*.tfstate*
