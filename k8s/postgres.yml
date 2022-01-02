@@ -63,6 +63,8 @@ spec:
         envFrom:
         - secretRef:
             name: ema-secrets
+        - configMapRef:
+            name: ema-config
         ports:
         - containerPort: 5432
           name: postgres
