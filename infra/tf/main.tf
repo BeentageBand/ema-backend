@@ -70,39 +70,12 @@ resource "aws_security_group_rule" "create-sgr-outbound" {
 resource "aws_instance" "ansible" {
   count         = 3
   ami           = data.aws_ami.ubuntu.id
-  instance_type = "t2.micro"
+  instance_type = "t3.micro"
   key_name      = aws_key_pair.deployer.key_name
   security_groups = ["Ansible-SG"]
   tags = {
     Name = "Ansible${count.index}"
   }
-}
-
-resource "null_resource" "ansible-node" {
-    depends_on = [null_resource.ansible-pem]
-
-    connection {
-      type        = "ssh"
-      user        = "ubuntu"
-      private_key = tls_private_key.private-key.private_key_pem
-      host        = aws_instance.ansible.*.public_dns[0]
-    }
-
-
-    provisioner "file" {
-        source      = "${path.cwd}/ansible-node.sh"
-        destination = "/tmp/ansible-node.sh"
-    }
-
-    provisioner "remote-exec" {
-        inline = [
-          "chmod u+x /tmp/ansible-node.sh",
-          "/tmp/ansible-node.sh",
-          "echo '[ansible]' > ~/hosts",
-          "echo '${aws_instance.ansible.*.public_dns[1]}' >> ~/hosts",
-          "echo '${aws_instance.ansible.*.public_dns[2]}' >> ~/hosts"
-        ]
-    }
 }
 
 resource "null_resource" "ansible-pem" {

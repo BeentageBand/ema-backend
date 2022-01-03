@@ -1,5 +1,5 @@
 ---
-- hosts: "master, workers"
+- hosts: all
   remote_user: ubuntu
   become: yes
   become_method: sudo
@@ -8,70 +8,61 @@
   connection: ssh
 
   tasks:
-     - name: Create containerd config file
-       file:
-         path: "/etc/modules-load.d/containerd.conf"
-         state: "touch"
+    - name: Install aptitude using apt
+      apt: name=aptitude state=latest update_cache=yes force_apt_get=yes
 
-     - name: Add conf for containerd
-       blockinfile:
-         path: "/etc/modules-load.d/containerd.conf"
-         block: |
-               overlay
-               br_netfilter
+    - name: Install required system packages
+      apt: name={{ item }} state=latest update_cache=yes
+      loop: [ 'apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common', 'python3-pip', 'virtualenv', 'python3-setuptools']
 
-     - name: modprobe
-       shell: |
-               sudo modprobe overlay
-               sudo modprobe br_netfilter
+    - name: Add Docker GPG apt Key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker Repository
+      apt_repository:
+        repo: deb https://download.docker.com/linux/ubuntu bionic stable
+        state: present
+
+    - name: Update apt and install docker-ce
+      apt: 
+        name: docker-ce
+        update_cache: yes
+        state: latest
+
+    - name: Copy daemon json config
+      become: yes
+      copy:
+        src: daemon.json
+        dest: /etc/docker/daemon.json
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Restart dockerd
+      shell: |
+        sudo systemctl restart docker
 
 
-     - name: Set system configurations for Kubernetes networking
-       file:
-         path: "/etc/sysctl.d/99-kubernetes-cri.conf"
-         state: "touch"
+    - name: install and configure dependencies
+      shell: |
+              sudo apt-get update && sudo apt-get install -y apt-transport-https curl
+              curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
 
-     - name: Add conf for containerd
-       blockinfile:
-         path: "/etc/sysctl.d/99-kubernetes-cri.conf"
-         block: |
-                net.bridge.bridge-nf-call-iptables = 1
-                net.ipv4.ip_forward = 1
-                net.bridge.bridge-nf-call-ip6tables = 1
+    - name: Create kubernetes repo file
+      file:
+        path: "/etc/apt/sources.list.d/kubernetes.list"
+        state: "touch"
 
-     - name: Apply new settings
-       command: sudo sysctl --system
+    - name: Add K8s Source
+      blockinfile:
+        path: "/etc/apt/sources.list.d/kubernetes.list"
+        block: |
+              deb https://apt.kubernetes.io/ kubernetes-xenial main
 
-     - name: install containerd
-       shell: |
-               sudo apt-get update && sudo apt-get install -y containerd
-               sudo mkdir -p /etc/containerd
-               sudo containerd config default | sudo tee /etc/containerd/config.toml
-               sudo systemctl restart containerd
-
-     - name: disable swap
-       shell: |
-               sudo swapoff -a
-               sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
-
-     - name: install and configure dependencies
-       shell: |
-               sudo apt-get update && sudo apt-get install -y apt-transport-https curl
-               curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-
-     - name: Create kubernetes repo file
-       file:
-         path: "/etc/apt/sources.list.d/kubernetes.list"
-         state: "touch"
-
-     - name: Add K8s Source
-       blockinfile:
-         path: "/etc/apt/sources.list.d/kubernetes.list"
-         block: |
-               deb https://apt.kubernetes.io/ kubernetes-xenial main
-
-     - name: install kubernetes
-       shell: |
-               sudo apt-get update
-               sudo apt-get install -y kubelet=1.20.1-00 kubeadm=1.20.1-00 kubectl=1.20.1-00
-               sudo apt-mark hold kubelet kubeadm kubectl
+    - name: install kubernetes
+      shell: |
+              sudo apt-get update
+              sudo apt-get install -y kubelet=1.23.1-00 kubeadm=1.23.1-00 kubectl=1.23.1-00
+              sudo apt-mark hold kubelet kubeadm kubectl
