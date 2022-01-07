@@ -11,8 +11,11 @@ readonly ANSIBLE_HOSTS="${HOME}/hosts"
 
 pushd tf
 
-terraform init
-terraform apply -auto-approve
+if [[ -d ".terraform" ]]; then
+    terraform init
+fi
+terraform plan -output .tfplan
+terraform apply -auto-approve .tfplan
 terraform output -raw private-key > "${ANSIBLE_PEM}"
 
 echo '[master]' > "${ANSIBLE_HOSTS}"
@@ -25,12 +28,12 @@ do
 done
 popd
 
-exit 0
-
+source ./ansible-install.sh
 
 pushd ./ansible
-ansible-playbook --private-key "${ANSIBLE_PEM}" -u 'ubuntu' -i "${ANSIBLE_HOSTS}" users.yml
-ansible-playbook --private-key "${ANSIBLE_PEM}" -u 'ubuntu' -i "${ANSIBLE_HOSTS}" install-k8s.yml
-ansible-playbook --private-key "${ANSIBLE_PEM}" -u 'ubuntu' -i "${ANSIBLE_HOSTS}" master.yml
-ansible-playbook --private-key "${ANSIBLE_PEM}" -u 'ubuntu' -i "${ANSIBLE_HOSTS}" join-workers.yml
+ansible-playbook -vv --private-key "${ANSIBLE_PEM}" -i "${ANSIBLE_HOSTS}" users.yml
+ansible-playbook -vv --private-key "${ANSIBLE_PEM}" -i "${ANSIBLE_HOSTS}" install-k8s.yml
+# This will require sudo password
+ansible-playbook -vv --private-key "${ANSIBLE_PEM}" -i "${ANSIBLE_HOSTS}" -K k8s-master.yml 
+ansible-playbook -vv --private-key "${ANSIBLE_PEM}" -i "${ANSIBLE_HOSTS}" -K k8s-nodes.yml
 popd
