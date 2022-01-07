@@ -14,7 +14,7 @@ pushd tf
 if [[ -d ".terraform" ]]; then
     terraform init
 fi
-terraform plan -output .tfplan
+terraform plan -out .tfplan
 terraform apply -auto-approve .tfplan
 terraform output -raw private-key > "${ANSIBLE_PEM}"
 

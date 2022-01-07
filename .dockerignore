@@ -6,3 +6,4 @@ doc
 k8s
 venv
 .git
+.tfplan

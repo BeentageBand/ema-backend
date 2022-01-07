@@ -137,3 +137,4 @@ db.sqlite3
 .terraform
 *.lock.hcl
 *.tfstate*
+.tfplan
