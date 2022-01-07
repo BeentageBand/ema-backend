@@ -1,9 +1,9 @@
 - hosts: master
-  remote_user: ubuntu
   become: yes
+  remote_user: kube
   tasks:
     - name: initialize the cluster
-      shell: kubeadm init 
+      shell: kubeadm reset -f && kubeadm init
       args:
         chdir: $HOME
         creates: cluster_initialized.txt
