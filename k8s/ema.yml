@@ -85,4 +85,3 @@ spec:
     kind: Deployment
     name: ema
   targetCPUUtilizationPercentage: 50
-
