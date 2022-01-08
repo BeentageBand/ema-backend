@@ -10,7 +10,7 @@ data:
   DATABASE_HOST: "postgres.default.svc.cluster.local"
   DATABASE_NAME: "ema"
   DATABASE_PORT: "5432"
-  DEBUG: "true"
+  DJANGO_DEBUG: "true"
   PGDATA: "/var/lib/postgresql/data/pgdata"
   POSTGRES_NAME: "ema"
 
@@ -26,6 +26,7 @@ spec:
   - protocol: TCP
     port: 8000
     targetPort: 8000
+  type: NodePort
 
 ---
 apiVersion: apps/v1
